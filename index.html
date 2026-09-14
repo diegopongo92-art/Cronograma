@@ -15,8 +15,6 @@
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
-    <!-- FullCalendar CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -34,7 +32,7 @@
         }
         .navbar-brand { color: #111 !important; letter-spacing: -0.5px; }
         
-        /* Pestañas (Tabs) minimalistas */
+        /* Pestañas minimalistas */
         .nav-tabs { border-bottom: 2px solid #eaeaea; }
         .nav-tabs .nav-link { 
             border: none; 
@@ -52,12 +50,12 @@
             color: #111; 
         }
 
-        /* Calendario más amplio y limpio */
+        /* FullCalendar Estilos */
         .fc-theme-standard th { border-color: #f0f0f0; font-weight: 500; color: #555; padding: 10px 0; }
         .fc-theme-standard td, .fc-theme-standard th { border-color: #f0f0f0; }
-        .fc-event { border-radius: 4px; border: none; padding: 2px 4px; font-size: 0.85em; font-weight: 500; }
+        .fc-event { border-radius: 4px; border: none; padding: 2px 4px; font-size: 0.85em; font-weight: 500; cursor: pointer; }
         
-        /* Tabla minimalista */
+        /* Tabla */
         .table { border-color: #f0f0f0; }
         .table th { background-color: #fff; font-weight: 600; color: #444; border-bottom: 2px solid #eaeaea; }
         .table td { vertical-align: middle; }
@@ -80,6 +78,7 @@
     </style>
 </head>
 <body>
+
     <!-- Encabezado -->
     <nav class="navbar navbar-expand-lg navbar-mml py-3 mb-4">
         <div class="container-fluid px-4">
@@ -89,7 +88,6 @@
         </div>
     </nav>
 
-    <!-- Usamos container-fluid para aprovechar lo ancho de la pantalla -->
     <div class="container-fluid px-4 mb-5">
         
         <!-- Indicador de Carga -->
@@ -103,7 +101,7 @@
         <!-- Contenido Principal -->
         <div id="main-content">
             
-            <!-- Pestañas Minimalistas -->
+            <!-- Pestañas -->
             <ul class="nav nav-tabs mb-4" id="view-tabs" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link active" id="tab-calendar" data-bs-toggle="tab" data-bs-target="#view-calendar" type="button" role="tab">
@@ -122,7 +120,6 @@
                 <!-- VISTA 1: CALENDARIO -->
                 <div class="tab-pane fade show active" id="view-calendar" role="tabpanel">
                     <div class="bg-white p-4 rounded-4 border" style="border-color: #eaeaea !important;">
-                        <!-- Le damos más altura para que respire -->
                         <div id="calendar" style="min-height: 75vh;"></div>
                     </div>
                 </div>
@@ -131,13 +128,12 @@
                 <div class="tab-pane fade" id="view-table" role="tabpanel">
                     <div class="bg-white p-4 rounded-4 border" style="border-color: #eaeaea !important;">
                         
-                        <!-- Barra de Filtros Avanzados -->
+                        <!-- Filtros Avanzados -->
                         <div class="row mb-4 bg-light p-3 rounded-3">
                             <div class="col-md-4 mb-2 mb-md-0">
                                 <label class="form-label text-muted small fw-bold mb-1">Filtrar por Gerencia</label>
                                 <select id="filterGerencia" class="form-select">
                                     <option value="">Todas las gerencias</option>
-                                    <!-- Las opciones se llenarán con JS -->
                                 </select>
                             </div>
                             <div class="col-md-3 mb-2 mb-md-0">
@@ -154,8 +150,8 @@
                         <table id="actividadesTable" class="table dt-responsive nowrap w-100">
                             <thead>
                                 <tr>
-                                    <th>Fecha</th>
-                                    <th>Fin</th>
+                                    <th>Fecha Inicio</th>
+                                    <th>Fecha Fin</th>
                                     <th>Actividad</th>
                                     <th>Gerencia / Área</th>
                                     <th>Hora</th>
@@ -170,7 +166,7 @@
         </div>
     </div>
 
-    <!-- Modal de Detalles Estilizado -->
+    <!-- Modal de Detalles -->
     <div class="modal fade" id="eventModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
@@ -240,48 +236,65 @@
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
 
     <script>
-        // =========================================================================
-        // PEGA AQUÍ TU ENLACE CSV DE GOOGLE SHEETS
-        // =========================================================================
         const GOOGLE_SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQvUyF5iJVwJgFwXdEllaGqRe8IdhYuY9kiplTYQGqxtNnYvO6-nguq9-1cGxvDPg/pub?gid=2001074359&single=true&output=csv";
-        
-        // =========================================================================
-        // COLORES POR GERENCIA (Diseño Minimalista - Colores Pastel/Suaves)
-        // =========================================================================
+
         const coloresGerencia = {
-            "Cultura": { bg: "#f3e8ff", text: "#7e22ce", border: "#a855f7" }, // Morado
-            "EMAPE": { bg: "#ffedd5", text: "#c2410c", border: "#f97316" }, // Naranja
-            "PROHVILLA": { bg: "#ecfccb", text: "#4d7c0f", border: "#84cc16" }, // Verde Lima
-            "PROLIMA": { bg: "#dcfce7", text: "#15803d", border: "#22c55e" }, // Verde oscuro
-            "SERPAR": { bg: "#cffafe", text: "#0e7490", border: "#06b6d4" }, // Cyan
-            "Gerencia de Desarrollo Humano": { bg: "#e0e7ff", text: "#4338ca", border: "#6366f1" }, // Índigo
-            "Comunicaciones y Difusión": { bg: "#fce7f3", text: "#be185d", border: "#ec4899" }, // Rosa
-            "MML": { bg: "#f1f5f9", text: "#334155", border: "#64748b" }, // Gris oscuro
-            "Default": { bg: "#dbeafe", text: "#1d4ed8", border: "#3b82f6" } // Azul estándar
+            "Cultura": { bg: "#f3e8ff", text: "#7e22ce", border: "#a855f7" },
+            "EMAPE": { bg: "#ffedd5", text: "#c2410c", border: "#f97316" },
+            "PROHVILLA": { bg: "#ecfccb", text: "#4d7c0f", border: "#84cc16" },
+            "PROLIMA": { bg: "#dcfce7", text: "#15803d", border: "#22c55e" },
+            "SERPAR": { bg: "#cffafe", text: "#0e7490", border: "#06b6d4" },
+            "Gerencia de Desarrollo Humano": { bg: "#e0e7ff", text: "#4338ca", border: "#6366f1" },
+            "Comunicaciones y Difusión": { bg: "#fce7f3", text: "#be185d", border: "#ec4899" },
+            "MML": { bg: "#f1f5f9", text: "#334155", border: "#64748b" },
+            "Default": { bg: "#dbeafe", text: "#1d4ed8", border: "#3b82f6" }
         };
 
-        let tablaActividades; // Variable global para DataTables
+        let tablaActividades; 
+        let calendarInstance;
 
-        // --- Utilidades ---
-        function formatoISO(fechaDDMMYYYY) {
-            if (!fechaDDMMYYYY) return null;
-            const partes = fechaDDMMYYYY.split('/');
-            if (partes.length === 3) return `${partes[2]}-${partes[1]}-${partes[0]}`;
-            return fechaDDMMYYYY; 
+        // Convierte fechas DD/MM/YYYY o YYYY-MM-DD al formato ISO YYYY-MM-DD
+        function formatoISO(fechaTexto) {
+            if (!fechaTexto) return null;
+            const str = fechaTexto.trim();
+            if (str.includes('/')) {
+                const partes = str.split('/');
+                if (partes.length === 3) {
+                    const dia = partes[0].padStart(2, '0');
+                    const mes = partes[1].padStart(2, '0');
+                    const anio = partes[2];
+                    return `${anio}-${mes}-${dia}`;
+                }
+            }
+            if (str.includes('-')) {
+                const partes = str.split('-');
+                if (partes.length === 3) {
+                    if (partes[0].length === 4) return str; // YYYY-MM-DD
+                    const dia = partes[0].padStart(2, '0');
+                    const mes = partes[1].padStart(2, '0');
+                    const anio = partes[2];
+                    return `${anio}-${mes}-${dia}`;
+                }
+            }
+            return null;
         }
 
+        // Incrementa 1 día en formato ISO para los rangos inclusivos de FullCalendar
         function sumarUnDia(fechaISO) {
             if (!fechaISO) return null;
-            const fecha = new Date(fechaISO);
+            const partes = fechaISO.split('-');
+            const fecha = new Date(partes[0], partes[1] - 1, partes[2]);
             fecha.setDate(fecha.getDate() + 1);
-            return fecha.toISOString().split('T')[0];
+            
+            const yyyy = fecha.getFullYear();
+            const mm = String(fecha.getMonth() + 1).padStart(2, '0');
+            const dd = String(fecha.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
         }
 
-        // Obtener objeto de color, si no existe usa el Default
         function getColorObj(gerenciaName) {
             const keys = Object.keys(coloresGerencia);
-            // Búsqueda parcial (ej. si dice "Gerencia de Cultura" igual machea "Cultura")
-            for(let key of keys) {
+            for (let key of keys) {
                 if (gerenciaName.toLowerCase().includes(key.toLowerCase()) && key !== "Default") {
                     return coloresGerencia[key];
                 }
@@ -289,15 +302,15 @@
             return coloresGerencia["Default"];
         }
 
-        // --- Inicio ---
         document.addEventListener('DOMContentLoaded', function() {
             Papa.parse(GOOGLE_SHEETS_CSV_URL, {
                 download: true,
                 header: true,
+                skipEmptyLines: true,
                 complete: function(resultados) { procesarDatos(resultados.data); },
                 error: function(err) {
                     console.error(err);
-                    alert("Error al cargar datos. Verifica el enlace del CSV.");
+                    alert("Error al cargar datos. Verifica la publicación del CSV.");
                 }
             });
         });
@@ -305,58 +318,66 @@
         function procesarDatos(filasBrutas) {
             const eventosCalendario = [];
             const filasTabla = [];
-            const gerenciasUnicas = new Set(); // Para el filtro desplegable
+            const gerenciasUnicas = new Set();
 
             filasBrutas.forEach(fila => {
-                if (!fila['Actividad'] || !fila['Fecha Inicio']) return;
-
-                const titulo = fila['Actividad'].trim();
-                const fechaInicioTexto = fila['Fecha Inicio'].trim();
+                // Lectura de columnas según tus encabezados exactos
+                const titulo = fila['Actividad'] ? fila['Actividad'].trim() : '';
+                const fechaInicioTexto = fila['Fecha inicio'] ? fila['Fecha inicio'].trim() : '';
                 const fechaFinTexto = fila['Fecha Fin'] ? fila['Fecha Fin'].trim() : '';
                 const gerencia = fila['Gerencia'] ? fila['Gerencia'].trim() : 'General';
                 const hora = fila['Hora'] ? fila['Hora'].trim() : 'Por definir';
                 const lugar = fila['Lugar'] ? fila['Lugar'].trim() : 'Por definir';
                 const descripcion = fila['Descripción'] ? fila['Descripción'].trim() : '';
 
-                // Recolectar gerencias para el selector
+                if (!titulo || !fechaInicioTexto) return;
+
                 gerenciasUnicas.add(gerencia);
 
                 const fechaInicioISO = formatoISO(fechaInicioTexto);
                 let fechaFinISO = formatoISO(fechaFinTexto);
-                if (fechaFinISO) fechaFinISO = sumarUnDia(fechaFinISO);
 
-                const col = getColorObj(gerencia);
-                const fechaParaMostrar = fechaFinTexto ? `${fechaInicioTexto} al ${fechaFinTexto}` : fechaInicioTexto;
-
-                // Para Calendario (Usamos el color de borde de nuestra paleta)
-                eventosCalendario.push({
-                    title: titulo,
-                    start: fechaInicioISO,
-                    end: fechaFinISO,
-                    backgroundColor: col.bg,
-                    borderColor: col.border,
-                    textColor: col.text,
-                    extendedProps: {
-                        gerencia: gerencia,
-                        hora: hora,
-                        lugar: lugar,
-                        descripcion: descripcion,
-                        fechaMostrar: fechaParaMostrar,
-                        colorObj: col
+                if (fechaInicioISO) {
+                    if (fechaFinISO && fechaFinISO !== fechaInicioISO) {
+                        fechaFinISO = sumarUnDia(fechaFinISO);
+                    } else {
+                        fechaFinISO = undefined;
                     }
-                });
 
-                // Para Tabla (Columna 6 oculta con la descripción y el objeto color en JSON)
-                filasTabla.push([
-                    fechaInicioTexto,
-                    fechaFinTexto,
-                    titulo,
-                    gerencia,
-                    hora,
-                    lugar,
-                    descripcion,
-                    JSON.stringify(col) // Guardamos los colores para pintar la etiqueta en la tabla
-                ]);
+                    const col = getColorObj(gerencia);
+                    const fechaParaMostrar = (fechaFinTexto && fechaFinTexto !== fechaInicioTexto) 
+                        ? `${fechaInicioTexto} al ${fechaFinTexto}` 
+                        : fechaInicioTexto;
+
+                    eventosCalendario.push({
+                        title: titulo,
+                        start: fechaInicioISO,
+                        end: fechaFinISO,
+                        allDay: true,
+                        backgroundColor: col.bg,
+                        borderColor: col.border,
+                        textColor: col.text,
+                        extendedProps: {
+                            gerencia: gerencia,
+                            hora: hora,
+                            lugar: lugar,
+                            descripcion: descripcion,
+                            fechaMostrar: fechaParaMostrar,
+                            colorObj: col
+                        }
+                    });
+
+                    filasTabla.push([
+                        fechaInicioTexto,
+                        fechaFinTexto,
+                        titulo,
+                        gerencia,
+                        hora,
+                        lugar,
+                        descripcion,
+                        JSON.stringify(col)
+                    ]);
+                }
             });
 
             // Llenar selector de gerencias
@@ -368,25 +389,28 @@
                 selectGerencia.appendChild(option);
             });
 
+            // Mostrar el contenedor ANTES de inicializar librerías visuales
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+
             iniciarCalendario(eventosCalendario);
             iniciarTabla(filasTabla);
             configurarFiltros();
 
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('main-content').style.display = 'block';
-
-            // Redibujar componentes al cambiar de pestaña
-            $('button[data-bs-toggle="tab"]').on('shown.bs.tab', function () {
-                window.dispatchEvent(new Event('resize'));
-            });
+            // Ajustar tamaño del calendario tras hacer visible el DOM
+            setTimeout(() => {
+                if (calendarInstance) {
+                    calendarInstance.updateSize();
+                }
+            }, 100);
         }
 
         function iniciarCalendario(eventos) {
             const calendarEl = document.getElementById('calendar');
-            const calendar = new FullCalendar.Calendar(calendarEl, {
+            calendarInstance = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
                 locale: 'es',
-                height: '100%', // Se ajusta al contenedor
+                height: 'auto',
                 headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',
@@ -398,7 +422,17 @@
                     abrirDetalles(info.event.title, info.event.extendedProps);
                 }
             });
-            calendar.render();
+            calendarInstance.render();
+
+            // Sincronizar redimensionamiento al alternar pestañas
+            const tabCalendarBtn = document.getElementById('tab-calendar');
+            if (tabCalendarBtn) {
+                tabCalendarBtn.addEventListener('shown.bs.tab', function () {
+                    if (calendarInstance) {
+                        calendarInstance.updateSize();
+                    }
+                });
+            }
         }
 
         function iniciarTabla(datosFilas) {
@@ -408,13 +442,11 @@
                 language: { url: 'https://cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json' },
                 order: [[0, "asc"]],
                 columnDefs: [
-                    // Ocultamos Descripción (6) y el JSON de color (7)
-                    { targets: [6, 7], visible: false },
-                    // Renderizamos la etiqueta de Gerencia con su color (Columna 3)
+                    { targets: [6, 7], visible: false }, // Ocultar Descripción y JSON de colores
                     { 
                         targets: 3, 
                         render: function (data, type, row) {
-                            if(type === 'display') {
+                            if (type === 'display') {
                                 const col = JSON.parse(row[7]);
                                 return `<span class="badge-gerencia" style="background-color:${col.bg}; color:${col.text}; border: 1px solid ${col.border}">${data}</span>`;
                             }
@@ -424,10 +456,9 @@
                 ]
             });
 
-            // Click en fila de tabla para abrir Modal
             $('#actividadesTable tbody').on('click', 'tr', function () {
                 const dataFila = tablaActividades.row(this).data();
-                if(!dataFila) return;
+                if (!dataFila) return;
                 
                 const props = {
                     fechaMostrar: dataFila[1] ? `${dataFila[0]} al ${dataFila[1]}` : dataFila[0],
@@ -441,46 +472,34 @@
             });
         }
 
-        // --- Configuración de Filtros de Tabla ---
         function configurarFiltros() {
-            // Lógica personalizada de filtrado para DataTables
             $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
                 const filtroGerencia = $('#filterGerencia').val();
-                const filtroFecha = $('#filterFecha').val(); // formato: YYYY-MM-DD
+                const filtroFecha = $('#filterFecha').val();
                 
-                const filaGerencia = data[3]; // Columna 3
-                const filaFechaTexto = data[0]; // Columna 0 (DD/MM/YYYY)
+                const filaGerencia = data[3];
+                const filaFechaTexto = data[0];
 
-                // Comprobar Gerencia
-                if (filtroGerencia && filaGerencia !== filtroGerencia) {
-                    return false;
-                }
+                if (filtroGerencia && filaGerencia !== filtroGerencia) return false;
 
-                // Comprobar Fecha
                 if (filtroFecha) {
                     const filaFechaISO = formatoISO(filaFechaTexto);
-                    if (filaFechaISO !== filtroFecha) {
-                        return false;
-                    }
+                    if (filaFechaISO !== filtroFecha) return false;
                 }
                 return true;
             });
 
-            // Escuchar cambios en los inputs
             $('#filterGerencia, #filterFecha').on('change', function() {
                 tablaActividades.draw();
             });
 
-            // Botón limpiar
             $('#btnClearFilters').on('click', function() {
                 $('#filterGerencia').val('');
                 $('#filterFecha').val('');
-                // Limpiar también el buscador general de DataTables
                 tablaActividades.search('').draw();
             });
         }
 
-        // --- Modal ---
         function abrirDetalles(titulo, detalles) {
             document.getElementById('modalTitle').textContent = titulo;
             document.getElementById('modalFechas').textContent = detalles.fechaMostrar;
@@ -488,14 +507,12 @@
             document.getElementById('modalLugar').textContent = detalles.lugar;
             document.getElementById('modalDescripcion').textContent = detalles.descripcion || 'Sin información adicional.';
             
-            // Pintar la etiqueta de la gerencia en el modal
             const badge = document.getElementById('modalGerenciaBadge');
             badge.textContent = detalles.gerencia;
             badge.style.backgroundColor = detalles.colorObj.bg;
             badge.style.color = detalles.colorObj.text;
             badge.style.border = `1px solid ${detalles.colorObj.border}`;
 
-            // Botones
             const textoMaps = encodeURIComponent(detalles.lugar + ", Lima");
             document.getElementById('btnMaps').href = `https://www.google.com/maps/search/?api=1&query=${textoMaps}`;
 
