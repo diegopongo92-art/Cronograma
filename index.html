@@ -55,7 +55,7 @@
         <div id="loading" class="spinner-container">
             <div class="text-center">
                 <div class="spinner-border text-dark" role="status" style="width: 2.5rem; height: 2.5rem;"></div>
-                <h6 class="mt-3 text-muted fw-normal">Sincronizando datos...</h6>
+                <h6 class="mt-3 text-muted fw-normal" id="loading-text">Sincronizando datos...</h6>
             </div>
         </div>
 
@@ -186,6 +186,7 @@
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
 
     <script>
+        // REEMPLAZA ESTA URL CON EL ENLACE DE TU PESTAÑA ESPECÍFICA DE GOOGLE SHEETS EN CSV
         const BASE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSOtdd00kK0uzZSeCsmSV9Zmyg7EokUJXtluPyW86KIwp06VkQGYAjMq0n6XK-hnKRFTRgnVSiT81uG/pub?output=csv";
         const GOOGLE_SHEETS_CSV_URL = `${BASE_CSV_URL}&t=${Date.now()}`;
 
@@ -216,15 +217,14 @@
             return '';
         }
 
-        // Convierte múltiples formatos de fecha a YYYY-MM-DD
         function formatoISO(fechaTexto) {
             if (!fechaTexto) return null;
             
             const texto = String(fechaTexto).trim();
             const anioActual = new Date().getFullYear();
 
-            // 1. Formato DD/MM/YYYY o DD-MM-YYYY (ej. 25/09/2026)
-            const matchLatinoConAnio = texto.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+            // 1. DD/MM/YYYY o DD-MM-YYYY
+            const matchLatinoConAnio = texto.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
             if (matchLatinoConAnio) {
                 const dia = matchLatinoConAnio[1].padStart(2, '0');
                 const mes = matchLatinoConAnio[2].padStart(2, '0');
@@ -232,14 +232,14 @@
                 return `${anio}-${mes}-${dia}`;
             }
 
-            // 2. Formato YYYY-MM-DD o YYYY/MM/DD (ej. 2026-09-25)
-            const matchISO = texto.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+            // 2. YYYY-MM-DD o YYYY/MM/DD
+            const matchISO = texto.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
             if (matchISO) {
                 return `${matchISO[1]}-${matchISO[2].padStart(2, '0')}-${matchISO[3].padStart(2, '0')}`;
             }
 
-            // 3. Formato DD/MM (ej. 25/09 sin año)
-            const matchLatinoSinAnio = texto.match(/^(\d{1,2})[\/\-](\d{1,2})$/);
+            // 3. DD/MM sin año
+            const matchLatinoSinAnio = texto.match(/^(\d{1,2})[\/\-](\d{1,2})/);
             if (matchLatinoSinAnio) {
                 const dia = matchLatinoSinAnio[1].padStart(2, '0');
                 const mes = matchLatinoSinAnio[2].padStart(2, '0');
@@ -279,11 +279,15 @@
                 header: true,
                 skipEmptyLines: true,
                 complete: function(resultados) { 
-                    procesarDatos(resultados.data || []); 
+                    if (!resultados.data || resultados.data.length === 0) {
+                        document.getElementById('loading-text').textContent = "La hoja de cálculo está vacía o el enlace no es válido.";
+                        return;
+                    }
+                    procesarDatos(resultados.data); 
                 },
                 error: function(err) {
-                    console.error("Error PapaParse:", err);
-                    alert("Error al cargar los datos desde Google Sheets.");
+                    console.error("Error al descargar CSV:", err);
+                    document.getElementById('loading-text').textContent = "Error al descargar datos de Google Sheets.";
                 }
             });
         });
@@ -294,63 +298,62 @@
             const gerenciasUnicas = new Set();
 
             filasBrutas.forEach(fila => {
-                // Se buscan variaciones comunes en los nombres de columna
-                const titulo = obtenerValorColumna(fila, ['Actividad', 'Título', 'Evento', 'Nombre']);
-                const fechaInicioTexto = obtenerValorColumna(fila, ['Fecha inicio', 'Fecha Inicio', 'Fecha_inicio', 'Inicio']);
+                const titulo = obtenerValorColumna(fila, ['Actividad', 'Título', 'Evento', 'Nombre', 'Actividades']);
+                const fechaInicioTexto = obtenerValorColumna(fila, ['Fecha inicio', 'Fecha Inicio', 'Fecha_inicio', 'Inicio', 'Fecha']);
                 const fechaFinTexto = obtenerValorColumna(fila, ['Fecha Fin', 'Fecha fin', 'Fecha_fin', 'Fin']);
                 const gerencia = obtenerValorColumna(fila, ['Gerencia', 'Área', 'Gerencia/Área', 'Dependencia']) || 'General';
                 const hora = obtenerValorColumna(fila, ['Hora', 'Horario']) || 'Por definir';
                 const lugar = obtenerValorColumna(fila, ['Lugar', 'Ubicación']) || 'Por definir';
                 const descripcion = obtenerValorColumna(fila, ['Descripción', 'Descripcion', 'Detalle']);
 
-                if (!titulo || !fechaInicioTexto) return;
+                if (!titulo) return;
 
                 gerenciasUnicas.add(gerencia);
 
-                const fechaInicioISO = formatoISO(fechaInicioTexto);
+                // Si no tiene fecha de inicio, asigna la fecha de hoy para que no se oculte la actividad
+                const hoyISO = new Date().toISOString().split('T')[0];
+                const fechaInicioISO = formatoISO(fechaInicioTexto) || hoyISO;
                 let fechaFinISO = formatoISO(fechaFinTexto);
 
-                if (fechaInicioISO) {
-                    if (fechaFinISO && fechaFinISO !== fechaInicioISO) {
-                        fechaFinISO = sumarUnDia(fechaFinISO);
-                    } else {
-                        fechaFinISO = undefined;
-                    }
-
-                    const col = getColorObj(gerencia);
-                    const fechaParaMostrar = (fechaFinTexto && fechaFinTexto !== fechaInicioTexto) 
-                        ? `${fechaInicioTexto} al ${fechaFinTexto}` 
-                        : fechaInicioTexto;
-
-                    eventosCalendario.push({
-                        title: titulo,
-                        start: fechaInicioISO,
-                        end: fechaFinISO,
-                        allDay: true,
-                        backgroundColor: col.bg,
-                        borderColor: col.border,
-                        textColor: col.text,
-                        extendedProps: {
-                            gerencia: gerencia,
-                            hora: hora,
-                            lugar: lugar,
-                            descripcion: descripcion,
-                            fechaMostrar: fechaParaMostrar,
-                            colorObj: col
-                        }
-                    });
-
-                    filasTabla.push([
-                        fechaInicioTexto,
-                        fechaFinTexto,
-                        titulo,
-                        gerencia,
-                        hora,
-                        lugar,
-                        descripcion,
-                        JSON.stringify(col)
-                    ]);
+                if (fechaFinISO && fechaFinISO !== fechaInicioISO) {
+                    fechaFinISO = sumarUnDia(fechaFinISO);
+                } else {
+                    fechaFinISO = undefined;
                 }
+
+                const col = getColorObj(gerencia);
+                const fechaParaMostrar = (fechaFinTexto && fechaFinTexto !== fechaInicioTexto) 
+                    ? `${fechaInicioTexto || 'Por definir'} al ${fechaFinTexto}` 
+                    : (fechaInicioTexto || 'Por definir');
+
+                eventosCalendario.push({
+                    title: titulo,
+                    start: fechaInicioISO,
+                    end: fechaFinISO,
+                    allDay: true,
+                    backgroundColor: col.bg,
+                    borderColor: col.border,
+                    textColor: col.text,
+                    extendedProps: {
+                        gerencia: gerencia,
+                        hora: hora,
+                        lugar: lugar,
+                        descripcion: descripcion,
+                        fechaMostrar: fechaParaMostrar,
+                        colorObj: col
+                    }
+                });
+
+                filasTabla.push([
+                    fechaInicioTexto || 'Por definir',
+                    fechaFinTexto || '',
+                    titulo,
+                    gerencia,
+                    hora,
+                    lugar,
+                    descripcion,
+                    JSON.stringify(col)
+                ]);
             });
 
             const selectGerencia = document.getElementById('filterGerencia');
@@ -372,7 +375,6 @@
         function iniciarCalendario(eventos) {
             const calendarEl = document.getElementById('calendar');
             
-            // Establece la vista en el mes del primer evento o en la fecha actual
             let fechaInicial = new Date();
             if (eventos.length > 0 && eventos[0].start) {
                 fechaInicial = eventos[0].start;
