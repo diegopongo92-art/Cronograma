@@ -186,7 +186,9 @@
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
 
     <script>
-        const GOOGLE_SHEETS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQvUyF5iJVwJgFwXdEllaGqRe8IdhYuY9kiplTYQGqxtNnYvO6-nguq9-1cGxvDPg/pub?gid=2001074359&single=true&output=csv";
+        // Se agrega parámetro anti-caché para forzar la carga de datos actualizados desde Google Sheets
+        const BASE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQvUyF5iJVwJgFwXdEllaGqRe8IdhYuY9kiplTYQGqxtNnYvO6-nguq9-1cGxvDPg/pub?gid=2001074359&single=true&output=csv";
+        const GOOGLE_SHEETS_CSV_URL = `${BASE_CSV_URL}&t=${Date.now()}`;
 
         const coloresGerencia = {
             "Cultura": { bg: "#f3e8ff", text: "#7e22ce", border: "#a855f7" },
@@ -203,7 +205,6 @@
         let tablaActividades; 
         let calendarInstance;
 
-        // Función para obtener valor de propiedad sin importar variaciones de mayúsculas o espacios
         function obtenerValorColumna(objeto, nombresPosibles) {
             const llaves = Object.keys(objeto);
             for (let nombre of nombresPosibles) {
@@ -215,14 +216,20 @@
             return '';
         }
 
-        // Formatea la fecha y agrega el año actual si no se especifica
         function formatoISO(fechaTexto) {
             if (!fechaTexto) return null;
             
+            const texto = fechaTexto.trim();
             const anioActual = new Date().getFullYear();
 
-            // Formato DD/MM/YYYY o DD-MM-YYYY
-            const matchLatinoConAnio = fechaTexto.match(/(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+            // 1. Formato YYYY-MM-DD o YYYY/MM/DD
+            const matchISO = texto.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+            if (matchISO) {
+                return `${matchISO[1]}-${matchISO[2].padStart(2, '0')}-${matchISO[3].padStart(2, '0')}`;
+            }
+
+            // 2. Formato DD/MM/YYYY o DD-MM-YYYY
+            const matchLatinoConAnio = texto.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
             if (matchLatinoConAnio) {
                 const dia = matchLatinoConAnio[1].padStart(2, '0');
                 const mes = matchLatinoConAnio[2].padStart(2, '0');
@@ -230,21 +237,12 @@
                 return `${anio}-${mes}-${dia}`;
             }
 
-            // Formato DD/MM (sin año, le asigna el año actual)
-            const matchLatinoSinAnio = fechaTexto.match(/(\d{1,2})[\/\-](\d{1,2})/);
+            // 3. Formato DD/MM (Sin año -> Asigna año actual)
+            const matchLatinoSinAnio = texto.match(/^(\d{1,2})[\/\-](\d{1,2})$/);
             if (matchLatinoSinAnio) {
                 const dia = matchLatinoSinAnio[1].padStart(2, '0');
                 const mes = matchLatinoSinAnio[2].padStart(2, '0');
                 return `${anioActual}-${mes}-${dia}`;
-            }
-
-            // Formato YYYY-MM-DD
-            const matchISO = fechaTexto.match(/(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
-            if (matchISO) {
-                const anio = matchISO[1];
-                const mes = matchISO[2].padStart(2, '0');
-                const dia = matchISO[3].padStart(2, '0');
-                return `${anio}-${mes}-${dia}`;
             }
 
             return null;
@@ -374,7 +372,6 @@
         function iniciarCalendario(eventos) {
             const calendarEl = document.getElementById('calendar');
             
-            // Si hay eventos, se mueve automáticamente a la fecha del primer evento
             let fechaInicial = new Date();
             if (eventos.length > 0) {
                 fechaInicial = eventos[0].start;
