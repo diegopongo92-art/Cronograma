@@ -8,7 +8,7 @@
     <!-- Fuentes Google -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Frameworks & Iconos -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -23,11 +23,12 @@
             --text-primary: #0f172a;
             --text-secondary: #64748b;
             --border-color: #e2e8f0;
-            --accent-black: #0f172a;
+            --accent-primary: #000000;
             --radius-md: 12px;
-            --radius-lg: 16px;
-            --shadow-subtle: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
-            --shadow-hover: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+            --radius-lg: 20px;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.08), 0 8px 10px -6px rgb(0 0 0 / 0.04);
         }
 
         body { 
@@ -39,31 +40,59 @@
 
         /* Navbar Moderno */
         .navbar-mml { 
-            background-color: var(--card-bg); 
+            background-color: rgba(255, 255, 255, 0.9); 
+            backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border-color); 
-            padding: 0.85rem 0;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
         .navbar-brand { 
             color: var(--text-primary) !important; 
-            letter-spacing: -0.02em; 
+            letter-spacing: -0.03em; 
             font-size: 1.25rem;
         }
         .brand-icon {
-            background: #0f172a;
+            background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
             color: #fff;
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            border-radius: 10px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(15, 23, 42, 0.15);
         }
 
-        /* Tabs tipo Pill Dashboard */
+        /* Tarjetas de Estadísticas KPI */
+        .kpi-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.25rem 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+        }
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        .kpi-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        /* Tabs Flotantes */
         .nav-tabs-custom {
             background-color: #e2e8f0;
-            padding: 4px;
-            border-radius: 12px;
+            padding: 5px;
+            border-radius: 14px;
             border: none;
             display: inline-flex;
         }
@@ -72,8 +101,8 @@
             color: var(--text-secondary); 
             font-weight: 500; 
             font-size: 0.88rem;
-            padding: 0.6rem 1.25rem; 
-            border-radius: 8px;
+            padding: 0.65rem 1.4rem; 
+            border-radius: 10px;
             transition: all 0.2s ease;
             margin: 0;
         }
@@ -83,20 +112,20 @@
         .nav-tabs-custom .nav-link.active { 
             background: #ffffff; 
             color: var(--text-primary); 
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             font-weight: 600;
         }
 
-        /* Contenedores Principales */
+        /* Dashboard Main Container */
         .card-container {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-subtle);
-            padding: 1.75rem;
+            box-shadow: var(--shadow-md);
+            padding: 1.8rem;
         }
 
-        /* Personalización Estilizada de FullCalendar */
+        /* FullCalendar Personalizado */
         .fc {
             --fc-border-color: #f1f5f9;
             --fc-button-bg-color: #ffffff;
@@ -109,80 +138,81 @@
             --fc-today-bg-color: #f8fafc;
         }
         .fc-toolbar-title {
-            font-weight: 700 !important;
-            font-size: 1.35rem !important;
+            font-weight: 800 !important;
+            font-size: 1.4rem !important;
             color: var(--text-primary);
-            letter-spacing: -0.02em;
+            letter-spacing: -0.03em;
         }
         .fc-button {
-            border-radius: 8px !important;
-            font-weight: 500 !important;
+            border-radius: 10px !important;
+            font-weight: 600 !important;
             font-size: 0.85rem !important;
             text-transform: capitalize !important;
-            padding: 0.4rem 0.85rem !important;
+            padding: 0.5rem 1rem !important;
             box-shadow: none !important;
+            transition: all 0.15s ease !important;
         }
         .fc-col-header-cell-cushion {
-            font-weight: 600;
+            font-weight: 700;
             color: var(--text-secondary);
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 12px 0 !important;
+            letter-spacing: 0.08em;
+            padding: 14px 0 !important;
         }
         .fc-daygrid-day-number {
-            font-weight: 500;
+            font-weight: 600;
             color: var(--text-secondary);
-            font-size: 0.85rem;
+            font-size: 0.88rem;
             padding: 8px 12px !important;
         }
         .fc-day-today .fc-daygrid-day-number {
-            background-color: var(--accent-black);
-            color: #fff;
+            background-color: var(--text-primary);
+            color: #ffffff;
             border-radius: 50%;
-            width: 26px;
-            height: 26px;
+            width: 28px;
+            height: 28px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             margin: 4px;
         }
 
-        /* Estilo Tarjeta de Eventos */
+        /* Tarjetas de Evento */
         .fc-event { 
-            border-radius: 6px !important; 
+            border-radius: 8px !important; 
             border: none !important; 
-            padding: 3px 6px !important; 
-            margin-bottom: 3px !important;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            padding: 4px 8px !important; 
+            margin-bottom: 4px !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.15s ease;
             cursor: pointer; 
         }
         .fc-event:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08);
+            transform: translateY(-1px) scale(1.01);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
         .fc-event-title {
             font-weight: 600 !important;
-            font-size: 0.8rem !important;
+            font-size: 0.82rem !important;
             line-height: 1.3;
         }
 
-        /* Tabla Avanzada */
+        /* Tabla de Búsqueda Avanzada */
         .table { border-color: var(--border-color); }
         .table th { 
             background-color: #f8fafc; 
-            font-weight: 600; 
+            font-weight: 700; 
             color: var(--text-secondary); 
-            font-size: 0.78rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.06em;
             border-bottom: 1px solid var(--border-color); 
-            padding: 0.85rem 1rem;
+            padding: 1rem;
         }
         .table td { 
             vertical-align: middle; 
-            padding: 0.9rem 1rem;
+            padding: 1rem;
             font-size: 0.9rem;
         }
         #actividadesTable tbody tr { 
@@ -193,69 +223,70 @@
             background-color: #f8fafc; 
         }
 
-        /* Filtros y Controles */
+        /* Form Controls */
         .form-control, .form-select { 
-            border-radius: 8px; 
+            border-radius: 10px; 
             border-color: #cbd5e1; 
             box-shadow: none !important; 
             font-size: 0.88rem;
-            padding: 0.55rem 0.85rem;
+            padding: 0.6rem 0.9rem;
         }
         .form-control:focus, .form-select:focus { 
-            border-color: var(--accent-black); 
+            border-color: var(--text-primary); 
         }
         .badge-gerencia { 
-            padding: 5px 10px; 
+            padding: 6px 12px; 
             font-weight: 600; 
-            border-radius: 6px; 
-            font-size: 0.75rem; 
+            border-radius: 8px; 
+            font-size: 0.78rem; 
             letter-spacing: 0.01em;
             display: inline-block;
         }
 
-        /* Loader */
+        /* Loading Spinner */
         .spinner-container { 
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            height: 65vh; 
+            height: 60vh; 
         }
 
         #main-content { display: none; }
 
-        /* Modal Interfaz */
+        /* Modal Rediseñado */
         .modal-content { 
             border-radius: var(--radius-lg); 
             border: none; 
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); 
+            box-shadow: var(--shadow-lg); 
             overflow: hidden;
         }
         .modal-header { 
             border-bottom: 1px solid var(--border-color); 
             background-color: #fff; 
-            padding: 1.25rem 1.5rem;
+            padding: 1.4rem 1.6rem;
         }
         .modal-footer { 
             border-top: 1px solid var(--border-color); 
             background-color: #f8fafc; 
-            padding: 1rem 1.5rem;
+            padding: 1.1rem 1.6rem;
         }
         .btn-custom { 
-            border-radius: 8px; 
-            font-weight: 500; 
+            border-radius: 10px; 
+            font-weight: 600; 
             font-size: 0.88rem;
-            padding: 0.55rem 1.1rem;
+            padding: 0.6rem 1.2rem;
+            transition: all 0.2s ease;
         }
         .detail-icon-box {
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
             background: #f1f5f9;
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--text-secondary);
-            font-size: 0.95rem;
+            font-size: 1rem;
             flex-shrink: 0;
         }
     </style>
@@ -265,25 +296,69 @@
     <!-- Header Navigation -->
     <nav class="navbar navbar-expand-lg navbar-mml mb-4">
         <div class="container-fluid px-4">
-            <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="#">
-                <span class="brand-icon"><i class="fa-solid fa-calendar-days fs-6"></i></span>
-                <span>Agenda Municipal MML</span>
+            <a class="navbar-brand fw-bold d-flex align-items-center gap-3" href="#">
+                <span class="brand-icon"><i class="fa-solid fa-calendar-days"></i></span>
+                <div>
+                    <span class="d-block leading-tight">Agenda Municipal</span>
+                    <small class="text-secondary fw-normal fs-6" style="font-size: 0.78rem !important;">Municipalidad Metropolitana de Lima</small>
+                </div>
             </a>
         </div>
     </nav>
 
     <div class="container-fluid px-4 mb-5">
-        <!-- Pantalla de Carga -->
+        <!-- Loader Screen -->
         <div id="loading" class="spinner-container">
             <div class="text-center">
-                <div class="spinner-border text-dark mb-3" role="status" style="width: 2.2rem; height: 2.2rem; stroke-width: 3;"></div>
-                <h6 class="text-secondary fw-medium fs-6 mb-0" id="loading-text">Sincronizando actividades...</h6>
+                <div class="spinner-border text-dark mb-3" role="status" style="width: 2.5rem; height: 2.5rem;"></div>
+                <h6 class="text-secondary fw-semibold fs-6 mb-0" id="loading-text">Cargando actividades actualizadas...</h6>
             </div>
         </div>
 
-        <!-- Contenido Principal -->
+        <!-- Contenido Principal Dashboard -->
         <div id="main-content">
-            <!-- Selector de Vistas -->
+            
+            <!-- Tarjetas Resumen KPI -->
+            <div class="row g-3 mb-4">
+                <div class="col-6 col-lg-3">
+                    <div class="kpi-card d-flex align-items-center gap-3">
+                        <div class="kpi-icon bg-primary-subtle text-primary"><i class="fa-solid fa-calendar-check"></i></div>
+                        <div>
+                            <small class="text-secondary fw-semibold d-block" style="font-size: 0.75rem;">TOTAL ACTIVIDADES</small>
+                            <h4 class="fw-bold mb-0 text-dark" id="kpi-total">0</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="kpi-card d-flex align-items-center gap-3">
+                        <div class="kpi-icon bg-success-subtle text-success"><i class="fa-solid fa-clock-rotate-left"></i></div>
+                        <div>
+                            <small class="text-secondary fw-semibold d-block" style="font-size: 0.75rem;">HOY EN AGENDA</small>
+                            <h4 class="fw-bold mb-0 text-dark" id="kpi-hoy">0</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="kpi-card d-flex align-items-center gap-3">
+                        <div class="kpi-icon bg-warning-subtle text-warning"><i class="fa-solid fa-calendar-week"></i></div>
+                        <div>
+                            <small class="text-secondary fw-semibold d-block" style="font-size: 0.75rem;">ESTA SEMANA</small>
+                            <h4 class="fw-bold mb-0 text-dark" id="kpi-semana">0</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="kpi-card d-flex align-items-center gap-3">
+                        <div class="kpi-icon bg-purple-subtle text-purple" style="background-color: #f3e8ff; color: #7e22ce;"><i class="fa-solid fa-building-user"></i></div>
+                        <div>
+                            <small class="text-secondary fw-semibold d-block" style="font-size: 0.75rem;">GERENCIAS ACTIVAS</small>
+                            <h4 class="fw-bold mb-0 text-dark" id="kpi-gerencias">0</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Header con Selector de Vistas -->
             <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
                 <ul class="nav nav-tabs-custom" id="view-tabs" role="tablist">
                     <li class="nav-item" role="presentation">
@@ -313,13 +388,13 @@
                         <!-- Panel de Filtros -->
                         <div class="row g-3 mb-4 p-3 rounded-3" style="background-color: #f8fafc; border: 1px solid var(--border-color);">
                             <div class="col-md-4">
-                                <label class="form-label text-secondary small fw-semibold mb-1">Filtrar por Gerencia</label>
+                                <label class="form-label text-secondary small fw-bold mb-1">Filtrar por Gerencia</label>
                                 <select id="filterGerencia" class="form-select">
                                     <option value="">Todas las gerencias</option>
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <label class="form-label text-secondary small fw-semibold mb-1">Buscar por Fecha</label>
+                                <label class="form-label text-secondary small fw-bold mb-1">Buscar por Fecha</label>
                                 <input type="date" id="filterFecha" class="form-control">
                             </div>
                             <div class="col-md-5 d-flex align-items-end justify-content-end">
@@ -329,7 +404,7 @@
                             </div>
                         </div>
 
-                        <!-- Tabla de Datos -->
+                        <!-- Tabla DataTables -->
                         <table id="actividadesTable" class="table dt-responsive nowrap w-100">
                             <thead>
                                 <tr>
@@ -349,12 +424,12 @@
         </div>
     </div>
 
-    <!-- Modal de Detalles Rediseñado -->
+    <!-- Modal de Detalles -->
     <div class="modal fade" id="eventModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header px-4">
-                    <div class="d-flex align-items-center gap-2">
+                    <div class="d-flex align-items-center gap-3">
                         <span id="modalGerenciaBadge" class="badge-gerencia"></span>
                         <h5 class="modal-title fw-bold text-dark m-0 fs-5" id="modalTitle">Título</h5>
                     </div>
@@ -366,8 +441,8 @@
                             <div class="d-flex align-items-center gap-3">
                                 <div class="detail-icon-box"><i class="fa-regular fa-calendar-days"></i></div>
                                 <div>
-                                    <small class="text-secondary d-block fw-semibold" style="font-size: 0.75rem; letter-spacing: 0.03em;">FECHA</small>
-                                    <span id="modalFechas" class="fw-medium text-dark"></span>
+                                    <small class="text-secondary d-block fw-bold" style="font-size: 0.72rem; letter-spacing: 0.05em;">FECHA DEL EVENTO</small>
+                                    <span id="modalFechas" class="fw-semibold text-dark"></span>
                                 </div>
                             </div>
                         </div>
@@ -375,8 +450,8 @@
                             <div class="d-flex align-items-center gap-3">
                                 <div class="detail-icon-box"><i class="fa-regular fa-clock"></i></div>
                                 <div>
-                                    <small class="text-secondary d-block fw-semibold" style="font-size: 0.75rem; letter-spacing: 0.03em;">HORA</small>
-                                    <span id="modalHora" class="fw-medium text-dark"></span>
+                                    <small class="text-secondary d-block fw-bold" style="font-size: 0.72rem; letter-spacing: 0.05em;">HORARIO</small>
+                                    <span id="modalHora" class="fw-semibold text-dark"></span>
                                 </div>
                             </div>
                         </div>
@@ -384,31 +459,31 @@
                             <div class="d-flex align-items-center gap-3">
                                 <div class="detail-icon-box"><i class="fa-solid fa-location-dot"></i></div>
                                 <div>
-                                    <small class="text-secondary d-block fw-semibold" style="font-size: 0.75rem; letter-spacing: 0.03em;">LUGAR / UBICACIÓN</small>
-                                    <span id="modalLugar" class="fw-medium text-dark"></span>
+                                    <small class="text-secondary d-block fw-bold" style="font-size: 0.72rem; letter-spacing: 0.05em;">LUGAR / UBICACIÓN</small>
+                                    <span id="modalLugar" class="fw-semibold text-dark"></span>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="p-3 rounded-3" style="background-color: #f8fafc; border: 1px solid var(--border-color);">
-                        <small class="text-secondary d-block fw-semibold mb-1" style="font-size: 0.75rem; letter-spacing: 0.03em;">DESCRIPCIÓN</small>
-                        <p id="modalDescripcion" class="mb-0 text-dark" style="white-space: pre-wrap; font-size: 0.92rem; line-height: 1.5;"></p>
+                    <div class="p-3.5 rounded-3 p-3" style="background-color: #f8fafc; border: 1px solid var(--border-color);">
+                        <small class="text-secondary d-block fw-bold mb-1" style="font-size: 0.72rem; letter-spacing: 0.05em;">DESCRIPCIÓN Y DETALLES</small>
+                        <p id="modalDescripcion" class="mb-0 text-dark" style="white-space: pre-wrap; font-size: 0.92rem; line-height: 1.6;"></p>
                     </div>
                 </div>
                 <div class="modal-footer px-4">
                     <a id="btnMaps" href="#" target="_blank" class="btn btn-outline-dark btn-custom me-auto">
-                        <i class="fa-solid fa-map-location-dot me-1"></i> Abrir en Maps
+                        <i class="fa-solid fa-map-location-dot me-1"></i> Abrir en Google Maps
                     </a>
                     <a id="btnWhatsapp" href="#" target="_blank" class="btn btn-dark btn-custom">
-                        <i class="fa-brands fa-whatsapp me-1"></i> Compartir
+                        <i class="fa-brands fa-whatsapp me-1"></i> Compartir Evento
                     </a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Scripts -->
+    <!-- Scripts Javascript -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
@@ -509,14 +584,14 @@
                 skipEmptyLines: true,
                 complete: function(resultados) { 
                     if (!resultados.data || resultados.data.length === 0) {
-                        document.getElementById('loading-text').textContent = "No se encontraron datos disponibles en Google Sheets.";
+                        document.getElementById('loading-text').textContent = "No se encontraron registros en Google Sheets.";
                         return;
                     }
                     procesarDatos(resultados.data); 
                 },
                 error: function(err) {
                     console.error("Error PapaParse:", err);
-                    document.getElementById('loading-text').textContent = "Error de conexión al cargar la hoja de cálculo.";
+                    document.getElementById('loading-text').textContent = "Error de conexión con Google Sheets.";
                 }
             });
         });
@@ -525,6 +600,15 @@
             const eventosCalendario = [];
             const filasTabla = [];
             const gerenciasUnicas = new Set();
+            const hoyISO = new Date().toISOString().split('T')[0];
+
+            let countHoy = 0;
+            let countSemana = 0;
+
+            const inicioSemana = new Date();
+            inicioSemana.setDate(inicioSemana.getDate() - inicioSemana.getDay());
+            const finSemana = new Date(inicioSemana);
+            finSemana.setDate(finSemana.getDate() + 6);
 
             filasBrutas.forEach(fila => {
                 const titulo = obtenerValorColumna(fila, ['Actividad', 'Título', 'Evento', 'Nombre', 'Actividades']);
@@ -539,9 +623,13 @@
 
                 gerenciasUnicas.add(gerencia);
 
-                const hoyISO = new Date().toISOString().split('T')[0];
                 const fechaInicioISO = formatoISO(fechaInicioTexto) || hoyISO;
                 let fechaFinISO = formatoISO(fechaFinTexto);
+
+                // Cálculo de Métricas KPI
+                if (fechaInicioISO === hoyISO) countHoy++;
+                const fechaObj = new Date(fechaInicioISO);
+                if (fechaObj >= inicioSemana && fechaObj <= finSemana) countSemana++;
 
                 if (fechaFinISO && fechaFinISO !== fechaInicioISO) {
                     fechaFinISO = sumarUnDia(fechaFinISO);
@@ -584,6 +672,12 @@
                 ]);
             });
 
+            // Actualizar Métricas KPI en Dashboard
+            document.getElementById('kpi-total').textContent = eventosCalendario.length;
+            document.getElementById('kpi-hoy').textContent = countHoy;
+            document.getElementById('kpi-semana').textContent = countSemana;
+            document.getElementById('kpi-gerencias').textContent = gerenciasUnicas.size;
+
             const selectGerencia = document.getElementById('filterGerencia');
             Array.from(gerenciasUnicas).sort().forEach(ger => {
                 let option = document.createElement('option');
@@ -603,14 +697,12 @@
         function iniciarCalendario(eventos) {
             const calendarEl = document.getElementById('calendar');
             
-            let fechaInicial = new Date();
-            if (eventos.length > 0 && eventos[0].start) {
-                fechaInicial = eventos[0].start;
-            }
+            // FORZAR SIEMPRE LA VISTA AL MES Y AÑO ACTUAL (Septiembre de 2026)
+            const fechaActualSistema = new Date();
 
             calendarInstance = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
-                initialDate: fechaInicial,
+                initialDate: fechaActualSistema,
                 locale: 'es',
                 height: 'auto',
                 headerToolbar: {
@@ -713,7 +805,7 @@
             document.getElementById('modalFechas').textContent = detalles.fechaMostrar;
             document.getElementById('modalHora').textContent = detalles.hora;
             document.getElementById('modalLugar').textContent = detalles.lugar;
-            document.getElementById('modalDescripcion').textContent = detalles.descripcion || 'Sin información adicional disponible.';
+            document.getElementById('modalDescripcion').textContent = detalles.descripcion || 'Sin descripción o detalles adicionales registrados.';
             
             const badge = document.getElementById('modalGerenciaBadge');
             badge.textContent = detalles.gerencia;
