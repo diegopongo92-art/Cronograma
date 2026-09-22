@@ -3,103 +3,333 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal de Actividades - MML</title>
+    <title>Agenda de Actividades - MML</title>
     
+    <!-- Fuentes Google -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- Frameworks & Iconos -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        body { background-color: #fcfcfc; font-family: 'Inter', sans-serif; color: #333; }
-        .navbar-mml { background-color: #ffffff; border-bottom: 1px solid #eaeaea; }
-        .navbar-brand { color: #111 !important; letter-spacing: -0.5px; }
-        .nav-tabs { border-bottom: 2px solid #eaeaea; }
-        .nav-tabs .nav-link { border: none; color: #666; font-weight: 500; padding: 1rem 2rem; border-bottom: 2px solid transparent; margin-bottom: -2px; }
-        .nav-tabs .nav-link:hover { border-color: transparent; color: #111; }
-        .nav-tabs .nav-link.active { background: transparent; border-color: transparent; border-bottom: 2px solid #111; color: #111; }
-        .fc-theme-standard th { border-color: #f0f0f0; font-weight: 500; color: #555; padding: 10px 0; }
-        .fc-theme-standard td, .fc-theme-standard th { border-color: #f0f0f0; }
-        .fc-event { border-radius: 4px; border: none; padding: 2px 4px; font-size: 0.85em; font-weight: 500; cursor: pointer; }
-        .table { border-color: #f0f0f0; }
-        .table th { background-color: #fff; font-weight: 600; color: #444; border-bottom: 2px solid #eaeaea; }
-        .table td { vertical-align: middle; }
-        #actividadesTable tbody tr { cursor: pointer; transition: background-color 0.2s; }
-        #actividadesTable tbody tr:hover { background-color: #f8f9fa; }
-        .form-control, .form-select { border-radius: 8px; border-color: #ddd; box-shadow: none !important; }
-        .form-control:focus, .form-select:focus { border-color: #111; }
-        .badge-gerencia { padding: 6px 10px; font-weight: 500; border-radius: 6px; font-size: 0.8em; }
-        .spinner-container { display: flex; justify-content: center; align-items: center; height: 60vh; }
+        :root {
+            --bg-canvas: #f8fafc;
+            --card-bg: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --accent-black: #0f172a;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --shadow-subtle: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+            --shadow-hover: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+        }
+
+        body { 
+            background-color: var(--bg-canvas); 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Navbar Moderno */
+        .navbar-mml { 
+            background-color: var(--card-bg); 
+            border-bottom: 1px solid var(--border-color); 
+            padding: 0.85rem 0;
+        }
+        .navbar-brand { 
+            color: var(--text-primary) !important; 
+            letter-spacing: -0.02em; 
+            font-size: 1.25rem;
+        }
+        .brand-icon {
+            background: #0f172a;
+            color: #fff;
+            width: 36px;
+            height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+        }
+
+        /* Tabs tipo Pill Dashboard */
+        .nav-tabs-custom {
+            background-color: #e2e8f0;
+            padding: 4px;
+            border-radius: 12px;
+            border: none;
+            display: inline-flex;
+        }
+        .nav-tabs-custom .nav-link { 
+            border: none; 
+            color: var(--text-secondary); 
+            font-weight: 500; 
+            font-size: 0.88rem;
+            padding: 0.6rem 1.25rem; 
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            margin: 0;
+        }
+        .nav-tabs-custom .nav-link:hover { 
+            color: var(--text-primary); 
+        }
+        .nav-tabs-custom .nav-link.active { 
+            background: #ffffff; 
+            color: var(--text-primary); 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            font-weight: 600;
+        }
+
+        /* Contenedores Principales */
+        .card-container {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-subtle);
+            padding: 1.75rem;
+        }
+
+        /* Personalización Estilizada de FullCalendar */
+        .fc {
+            --fc-border-color: #f1f5f9;
+            --fc-button-bg-color: #ffffff;
+            --fc-button-text-color: #0f172a;
+            --fc-button-border-color: #cbd5e1;
+            --fc-button-hover-bg-color: #f8fafc;
+            --fc-button-hover-border-color: #94a3b8;
+            --fc-button-active-bg-color: #0f172a;
+            --fc-button-active-border-color: #0f172a;
+            --fc-today-bg-color: #f8fafc;
+        }
+        .fc-toolbar-title {
+            font-weight: 700 !important;
+            font-size: 1.35rem !important;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+        .fc-button {
+            border-radius: 8px !important;
+            font-weight: 500 !important;
+            font-size: 0.85rem !important;
+            text-transform: capitalize !important;
+            padding: 0.4rem 0.85rem !important;
+            box-shadow: none !important;
+        }
+        .fc-col-header-cell-cushion {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 12px 0 !important;
+        }
+        .fc-daygrid-day-number {
+            font-weight: 500;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            padding: 8px 12px !important;
+        }
+        .fc-day-today .fc-daygrid-day-number {
+            background-color: var(--accent-black);
+            color: #fff;
+            border-radius: 50%;
+            width: 26px;
+            height: 26px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 4px;
+        }
+
+        /* Estilo Tarjeta de Eventos */
+        .fc-event { 
+            border-radius: 6px !important; 
+            border: none !important; 
+            padding: 3px 6px !important; 
+            margin-bottom: 3px !important;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            cursor: pointer; 
+        }
+        .fc-event:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08);
+        }
+        .fc-event-title {
+            font-weight: 600 !important;
+            font-size: 0.8rem !important;
+            line-height: 1.3;
+        }
+
+        /* Tabla Avanzada */
+        .table { border-color: var(--border-color); }
+        .table th { 
+            background-color: #f8fafc; 
+            font-weight: 600; 
+            color: var(--text-secondary); 
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid var(--border-color); 
+            padding: 0.85rem 1rem;
+        }
+        .table td { 
+            vertical-align: middle; 
+            padding: 0.9rem 1rem;
+            font-size: 0.9rem;
+        }
+        #actividadesTable tbody tr { 
+            cursor: pointer; 
+            transition: background-color 0.15s ease; 
+        }
+        #actividadesTable tbody tr:hover { 
+            background-color: #f8fafc; 
+        }
+
+        /* Filtros y Controles */
+        .form-control, .form-select { 
+            border-radius: 8px; 
+            border-color: #cbd5e1; 
+            box-shadow: none !important; 
+            font-size: 0.88rem;
+            padding: 0.55rem 0.85rem;
+        }
+        .form-control:focus, .form-select:focus { 
+            border-color: var(--accent-black); 
+        }
+        .badge-gerencia { 
+            padding: 5px 10px; 
+            font-weight: 600; 
+            border-radius: 6px; 
+            font-size: 0.75rem; 
+            letter-spacing: 0.01em;
+            display: inline-block;
+        }
+
+        /* Loader */
+        .spinner-container { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 65vh; 
+        }
+
         #main-content { display: none; }
-        .modal-content { border-radius: 16px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .modal-header { border-bottom: 1px solid #eaeaea; background-color: #fff; color: #111; border-radius: 16px 16px 0 0; }
-        .modal-footer { border-top: 1px solid #eaeaea; background-color: #fff; border-radius: 0 0 16px 16px; }
-        .btn-custom { border-radius: 8px; font-weight: 500; }
+
+        /* Modal Interfaz */
+        .modal-content { 
+            border-radius: var(--radius-lg); 
+            border: none; 
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); 
+            overflow: hidden;
+        }
+        .modal-header { 
+            border-bottom: 1px solid var(--border-color); 
+            background-color: #fff; 
+            padding: 1.25rem 1.5rem;
+        }
+        .modal-footer { 
+            border-top: 1px solid var(--border-color); 
+            background-color: #f8fafc; 
+            padding: 1rem 1.5rem;
+        }
+        .btn-custom { 
+            border-radius: 8px; 
+            font-weight: 500; 
+            font-size: 0.88rem;
+            padding: 0.55rem 1.1rem;
+        }
+        .detail-icon-box {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            flex-shrink: 0;
+        }
     </style>
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-mml py-3 mb-4">
+    <!-- Header Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-mml mb-4">
         <div class="container-fluid px-4">
-            <a class="navbar-brand fw-bold fs-4" href="#">
-                <i class="fa-solid fa-layer-group me-2" style="color: #111;"></i>Agenda MML
+            <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="#">
+                <span class="brand-icon"><i class="fa-solid fa-calendar-days fs-6"></i></span>
+                <span>Agenda Municipal MML</span>
             </a>
         </div>
     </nav>
 
     <div class="container-fluid px-4 mb-5">
+        <!-- Pantalla de Carga -->
         <div id="loading" class="spinner-container">
             <div class="text-center">
-                <div class="spinner-border text-dark" role="status" style="width: 2.5rem; height: 2.5rem;"></div>
-                <h6 class="mt-3 text-muted fw-normal" id="loading-text">Sincronizando datos...</h6>
+                <div class="spinner-border text-dark mb-3" role="status" style="width: 2.2rem; height: 2.2rem; stroke-width: 3;"></div>
+                <h6 class="text-secondary fw-medium fs-6 mb-0" id="loading-text">Sincronizando actividades...</h6>
             </div>
         </div>
 
+        <!-- Contenido Principal -->
         <div id="main-content">
-            <ul class="nav nav-tabs mb-4" id="view-tabs" role="tablist">
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link active" id="tab-calendar" data-bs-toggle="tab" data-bs-target="#view-calendar" type="button" role="tab">
-                        <i class="fa-regular fa-calendar me-2"></i>Vista Calendario
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="tab-table" data-bs-toggle="tab" data-bs-target="#view-table" type="button" role="tab">
-                        <i class="fa-solid fa-bars-staggered me-2"></i>Búsqueda Avanzada
-                    </button>
-                </li>
-            </ul>
+            <!-- Selector de Vistas -->
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                <ul class="nav nav-tabs-custom" id="view-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="tab-calendar" data-bs-toggle="tab" data-bs-target="#view-calendar" type="button" role="tab">
+                            <i class="fa-regular fa-calendar-check me-2"></i>Vista Calendario
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="tab-table" data-bs-toggle="tab" data-bs-target="#view-table" type="button" role="tab">
+                            <i class="fa-solid fa-list-check me-2"></i>Búsqueda Avanzada
+                        </button>
+                    </li>
+                </ul>
+            </div>
 
             <div class="tab-content" id="view-tabsContent">
+                <!-- VISTA CALENDARIO -->
                 <div class="tab-pane fade show active" id="view-calendar" role="tabpanel">
-                    <div class="bg-white p-4 rounded-4 border" style="border-color: #eaeaea !important;">
+                    <div class="card-container">
                         <div id="calendar" style="min-height: 75vh;"></div>
                     </div>
                 </div>
 
+                <!-- VISTA TABLA -->
                 <div class="tab-pane fade" id="view-table" role="tabpanel">
-                    <div class="bg-white p-4 rounded-4 border" style="border-color: #eaeaea !important;">
-                        <div class="row mb-4 bg-light p-3 rounded-3">
-                            <div class="col-md-4 mb-2 mb-md-0">
-                                <label class="form-label text-muted small fw-bold mb-1">Filtrar por Gerencia</label>
+                    <div class="card-container">
+                        <!-- Panel de Filtros -->
+                        <div class="row g-3 mb-4 p-3 rounded-3" style="background-color: #f8fafc; border: 1px solid var(--border-color);">
+                            <div class="col-md-4">
+                                <label class="form-label text-secondary small fw-semibold mb-1">Filtrar por Gerencia</label>
                                 <select id="filterGerencia" class="form-select">
                                     <option value="">Todas las gerencias</option>
                                 </select>
                             </div>
-                            <div class="col-md-3 mb-2 mb-md-0">
-                                <label class="form-label text-muted small fw-bold mb-1">Buscar por Fecha Exacta</label>
+                            <div class="col-md-3">
+                                <label class="form-label text-secondary small fw-semibold mb-1">Buscar por Fecha</label>
                                 <input type="date" id="filterFecha" class="form-control">
                             </div>
                             <div class="col-md-5 d-flex align-items-end justify-content-end">
-                                <button id="btnClearFilters" class="btn btn-outline-secondary btn-custom">
-                                    <i class="fa-solid fa-eraser me-1"></i> Limpiar Filtros
+                                <button id="btnClearFilters" class="btn btn-outline-secondary btn-custom w-100 w-md-auto">
+                                    <i class="fa-solid fa-rotate-left me-1"></i> Limpiar Filtros
                                 </button>
                             </div>
                         </div>
 
+                        <!-- Tabla de Datos -->
                         <table id="actividadesTable" class="table dt-responsive nowrap w-100">
                             <thead>
                                 <tr>
@@ -119,54 +349,56 @@
         </div>
     </div>
 
-    <!-- Modal de Detalles -->
+    <!-- Modal de Detalles Rediseñado -->
     <div class="modal fade" id="eventModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
-                <div class="modal-header px-4 py-3">
-                    <span id="modalGerenciaBadge" class="badge-gerencia me-3"></span>
-                    <h5 class="modal-title fw-bold m-0" id="modalTitle">Título</h5>
+                <div class="modal-header px-4">
+                    <div class="d-flex align-items-center gap-2">
+                        <span id="modalGerenciaBadge" class="badge-gerencia"></span>
+                        <h5 class="modal-title fw-bold text-dark m-0 fs-5" id="modalTitle">Título</h5>
+                    </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body px-4 py-4">
                     <div class="row g-4 mb-4">
                         <div class="col-sm-6">
-                            <div class="d-flex align-items-start">
-                                <i class="fa-regular fa-calendar text-muted mt-1 me-3 fs-5"></i>
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="detail-icon-box"><i class="fa-regular fa-calendar-days"></i></div>
                                 <div>
-                                    <small class="text-muted d-block fw-bold">FECHA</small>
-                                    <span id="modalFechas" class="fs-6"></span>
+                                    <small class="text-secondary d-block fw-semibold" style="font-size: 0.75rem; letter-spacing: 0.03em;">FECHA</small>
+                                    <span id="modalFechas" class="fw-medium text-dark"></span>
                                 </div>
                             </div>
                         </div>
                         <div class="col-sm-6">
-                            <div class="d-flex align-items-start">
-                                <i class="fa-regular fa-clock text-muted mt-1 me-3 fs-5"></i>
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="detail-icon-box"><i class="fa-regular fa-clock"></i></div>
                                 <div>
-                                    <small class="text-muted d-block fw-bold">HORA</small>
-                                    <span id="modalHora" class="fs-6"></span>
+                                    <small class="text-secondary d-block fw-semibold" style="font-size: 0.75rem; letter-spacing: 0.03em;">HORA</small>
+                                    <span id="modalHora" class="fw-medium text-dark"></span>
                                 </div>
                             </div>
                         </div>
                         <div class="col-sm-12">
-                            <div class="d-flex align-items-start">
-                                <i class="fa-solid fa-location-dot text-muted mt-1 me-3 fs-5"></i>
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="detail-icon-box"><i class="fa-solid fa-location-dot"></i></div>
                                 <div>
-                                    <small class="text-muted d-block fw-bold">LUGAR</small>
-                                    <span id="modalLugar" class="fs-6"></span>
+                                    <small class="text-secondary d-block fw-semibold" style="font-size: 0.75rem; letter-spacing: 0.03em;">LUGAR / UBICACIÓN</small>
+                                    <span id="modalLugar" class="fw-medium text-dark"></span>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="bg-light p-3 rounded-3">
-                        <small class="text-muted d-block fw-bold mb-2">DESCRIPCIÓN</small>
-                        <p id="modalDescripcion" class="mb-0 text-dark" style="white-space: pre-wrap; font-size: 0.95em;"></p>
+                    <div class="p-3 rounded-3" style="background-color: #f8fafc; border: 1px solid var(--border-color);">
+                        <small class="text-secondary d-block fw-semibold mb-1" style="font-size: 0.75rem; letter-spacing: 0.03em;">DESCRIPCIÓN</small>
+                        <p id="modalDescripcion" class="mb-0 text-dark" style="white-space: pre-wrap; font-size: 0.92rem; line-height: 1.5;"></p>
                     </div>
                 </div>
-                <div class="modal-footer px-4 py-3">
-                    <a id="btnMaps" href="#" target="_blank" class="btn btn-outline-dark btn-custom">
-                        <i class="fa-solid fa-map-location-dot me-1"></i> Ver mapa
+                <div class="modal-footer px-4">
+                    <a id="btnMaps" href="#" target="_blank" class="btn btn-outline-dark btn-custom me-auto">
+                        <i class="fa-solid fa-map-location-dot me-1"></i> Abrir en Maps
                     </a>
                     <a id="btnWhatsapp" href="#" target="_blank" class="btn btn-dark btn-custom">
                         <i class="fa-brands fa-whatsapp me-1"></i> Compartir
@@ -176,6 +408,7 @@
         </div>
     </div>
 
+    <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
@@ -186,20 +419,19 @@
     <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
 
     <script>
-        // REEMPLAZA ESTA URL CON EL ENLACE DE TU PESTAÑA ESPECÍFICA DE GOOGLE SHEETS EN CSV
         const BASE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSOtdd00kK0uzZSeCsmSV9Zmyg7EokUJXtluPyW86KIwp06VkQGYAjMq0n6XK-hnKRFTRgnVSiT81uG/pub?output=csv";
         const GOOGLE_SHEETS_CSV_URL = `${BASE_CSV_URL}&t=${Date.now()}`;
 
         const coloresGerencia = {
-            "Cultura": { bg: "#f3e8ff", text: "#7e22ce", border: "#a855f7" },
-            "EMAPE": { bg: "#ffedd5", text: "#c2410c", border: "#f97316" },
-            "PROHVILLA": { bg: "#ecfccb", text: "#4d7c0f", border: "#84cc16" },
-            "PROLIMA": { bg: "#dcfce7", text: "#15803d", border: "#22c55e" },
-            "SERPAR": { bg: "#cffafe", text: "#0e7490", border: "#06b6d4" },
-            "Gerencia de Desarrollo Humano": { bg: "#e0e7ff", text: "#4338ca", border: "#6366f1" },
-            "Comunicaciones y Difusión": { bg: "#fce7f3", text: "#be185d", border: "#ec4899" },
-            "MML": { bg: "#f1f5f9", text: "#334155", border: "#64748b" },
-            "Default": { bg: "#dbeafe", text: "#1d4ed8", border: "#3b82f6" }
+            "Cultura": { bg: "#f3e8ff", text: "#6b21a8", border: "#c084fc" },
+            "EMAPE": { bg: "#ffedd5", text: "#9a3412", border: "#fb923c" },
+            "PROHVILLA": { bg: "#ecfccb", text: "#3f6212", border: "#a3e635" },
+            "PROLIMA": { bg: "#dcfce7", text: "#166534", border: "#4ade80" },
+            "SERPAR": { bg: "#cffafe", text: "#155e75", border: "#22d3ee" },
+            "Gerencia de Desarrollo Humano": { bg: "#e0e7ff", text: "#3730a3", border: "#818cf8" },
+            "Comunicaciones y Difusión": { bg: "#fce7f3", text: "#9d174d", border: "#f472b6" },
+            "MML": { bg: "#f1f5f9", text: "#334155", border: "#94a3b8" },
+            "Default": { bg: "#e0f2fe", text: "#075985", border: "#38bdf8" }
         };
 
         let tablaActividades; 
@@ -223,7 +455,6 @@
             const texto = String(fechaTexto).trim();
             const anioActual = new Date().getFullYear();
 
-            // 1. DD/MM/YYYY o DD-MM-YYYY
             const matchLatinoConAnio = texto.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
             if (matchLatinoConAnio) {
                 const dia = matchLatinoConAnio[1].padStart(2, '0');
@@ -232,13 +463,11 @@
                 return `${anio}-${mes}-${dia}`;
             }
 
-            // 2. YYYY-MM-DD o YYYY/MM/DD
             const matchISO = texto.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})/);
             if (matchISO) {
                 return `${matchISO[1]}-${matchISO[2].padStart(2, '0')}-${matchISO[3].padStart(2, '0')}`;
             }
 
-            // 3. DD/MM sin año
             const matchLatinoSinAnio = texto.match(/^(\d{1,2})[\/\-](\d{1,2})/);
             if (matchLatinoSinAnio) {
                 const dia = matchLatinoSinAnio[1].padStart(2, '0');
@@ -280,14 +509,14 @@
                 skipEmptyLines: true,
                 complete: function(resultados) { 
                     if (!resultados.data || resultados.data.length === 0) {
-                        document.getElementById('loading-text').textContent = "La hoja de cálculo está vacía o el enlace no es válido.";
+                        document.getElementById('loading-text').textContent = "No se encontraron datos disponibles en Google Sheets.";
                         return;
                     }
                     procesarDatos(resultados.data); 
                 },
                 error: function(err) {
-                    console.error("Error al descargar CSV:", err);
-                    document.getElementById('loading-text').textContent = "Error al descargar datos de Google Sheets.";
+                    console.error("Error PapaParse:", err);
+                    document.getElementById('loading-text').textContent = "Error de conexión al cargar la hoja de cálculo.";
                 }
             });
         });
@@ -310,7 +539,6 @@
 
                 gerenciasUnicas.add(gerencia);
 
-                // Si no tiene fecha de inicio, asigna la fecha de hoy para que no se oculte la actividad
                 const hoyISO = new Date().toISOString().split('T')[0];
                 const fechaInicioISO = formatoISO(fechaInicioTexto) || hoyISO;
                 let fechaFinISO = formatoISO(fechaFinTexto);
@@ -412,7 +640,7 @@
                 if (calendarInstance) {
                     calendarInstance.updateSize();
                 }
-            }, 300);
+            }, 250);
         }
 
         function iniciarTabla(datosFilas) {
@@ -485,7 +713,7 @@
             document.getElementById('modalFechas').textContent = detalles.fechaMostrar;
             document.getElementById('modalHora').textContent = detalles.hora;
             document.getElementById('modalLugar').textContent = detalles.lugar;
-            document.getElementById('modalDescripcion').textContent = detalles.descripcion || 'Sin información adicional.';
+            document.getElementById('modalDescripcion').textContent = detalles.descripcion || 'Sin información adicional disponible.';
             
             const badge = document.getElementById('modalGerenciaBadge');
             badge.textContent = detalles.gerencia;
